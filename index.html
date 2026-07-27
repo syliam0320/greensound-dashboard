@@ -3,146 +3,116 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GreenSound 품질 통합 대시보드</title>
+<title>GreenSound 품질 개선 우선순위 대시보드</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f5f7fb; --card:#ffffff; --ink:#172033; --muted:#697386; --line:#e3e8f0;
-  --navy:#17233f; --navy2:#263b67; --green:#66b77a; --green2:#2f7d5b;
-  --red:#e86464; --orange:#f2a64b; --blue:#4f83e3; --slate:#94a0b5; --shadow:0 12px 30px rgba(23,32,51,.08);
+  --bg:#edf3f7; --card:#ffffff; --ink:#102d3b; --muted:#6c7f8d; --line:#d2dee7;
+  --navy:#102d3b; --navy2:#174755; --green:#12a4a7; --green2:#0b6d72;
+  --red:#e52525; --orange:#e99b27; --blue:#4f7fde; --slate:#b8c5cf; --shadow:0 14px 30px rgba(15,45,59,.10);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 button,input,select{font:inherit}
-.wrap{max-width:1480px;margin:0 auto;padding:20px;display:flex;flex-direction:column}
-.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;background:linear-gradient(135deg,#173f2b 0%,#286344 55%,#4b8b58 100%);color:#fff;border-radius:24px;padding:28px 30px;box-shadow:0 18px 44px rgba(28,83,53,.18);position:relative;overflow:hidden}
-.topbar:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-145px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
+.wrap{max-width:1480px;margin:0 auto;padding:20px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;background:#102d3b;color:#fff;border:1px solid #102d3b;border-radius:22px;padding:22px 24px;box-shadow:var(--shadow)}
 .topbar h1{margin:0;font-size:28px;letter-spacing:-.8px}
-.topbar p{margin:8px 0 0;color:#dce7f7;font-size:13px}
+.topbar p{margin:8px 0 0;color:#d4eef0;font-size:13px}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;text-decoration:none}
+.btn{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer}
 .btn:hover{background:rgba(255,255,255,.16)}
-.wrap>.topbar{order:1}
-.wrap>.kpi-grid{order:2}
-.wrap>.tabs{order:3}
-.wrap>.toolbar{order:4}
-.wrap>.view{order:5}
-.wrap>.footer{order:6}
-.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 17px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.kpi:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:#4f83e3}
-.kpi:nth-child(2):before{background:#e86464}.kpi:nth-child(3):before{background:#f2a64b}.kpi:nth-child(4):before{background:#8b6fd6}.kpi:nth-child(5):before{background:#45a9a5}.kpi:nth-child(6):before{background:#66b77a}
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
 .kpi .label{font-size:11px;color:var(--muted);font-weight:800}
 .kpi .value{margin-top:6px;font-size:29px;font-weight:900;letter-spacing:-1px}
 .kpi .sub{margin-top:5px;font-size:11px;color:var(--muted)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px;padding:8px;background:#e9edf5;border:1px solid #dde3ed;border-radius:16px;position:sticky;top:8px;z-index:20;box-shadow:0 8px 18px rgba(23,32,51,.07)}
-.tab{border:0;background:transparent;color:#59657a;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:900;cursor:pointer}
-.tab.active{background:#fff;color:#315fae;box-shadow:0 6px 14px rgba(49,95,174,.12)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px;padding:8px;background:#f8fafc;border:1px solid #dbe5ec;border-radius:16px;position:sticky;top:8px;z-index:20;box-shadow:0 8px 16px rgba(15,45,59,.06)}
+.tab{border:0;background:transparent;color:#506978;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:900;cursor:pointer}
+.tab.active{background:#0b6d72;color:#fff;box-shadow:0 6px 14px rgba(11,109,114,.20)}
 .view{display:none}
 .view.active{display:block}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);min-height:320px}
 .card.short{min-height:auto}
-.card.dark{background:linear-gradient(160deg,#17233f,#2d4775);color:#fff;border-color:#334e79}
+.card.dark{background:#eef8f8;color:#102d3b;border-color:#c9e2e2}
 .card h3{margin:0 0 6px;font-size:20px;letter-spacing:-.4px}
 .card .desc{color:var(--muted);font-size:12px;margin:0 0 12px;line-height:1.5}
-.card.dark .desc{color:#dce7f7}
+.card.dark .desc{color:#6f788b}
 .chart-wrap{position:relative;height:255px}
 .section{margin-top:16px}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
 .upload-box{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.upload-label{display:inline-flex;align-items:center;gap:8px;border:1px dashed #8da5ce;border-radius:12px;padding:10px 12px;background:#f6f8fc;font-size:12px;font-weight:800;cursor:pointer}
+.upload-label{display:inline-flex;align-items:center;gap:8px;border:1px dashed #8f87df;border-radius:12px;padding:10px 12px;background:#f7f6ff;font-size:12px;font-weight:800;cursor:pointer}
 .upload-label input{display:none}
 .toolbar .note{font-size:12px;color:var(--muted)}
 .pills{display:flex;gap:8px;flex-wrap:wrap}
-.pill{background:rgba(255,255,255,.12);color:#f4f7fc;border:1px solid rgba(255,255,255,.2);padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900}
+.pill{background:#eeecff;color:#5548c9;border:1px solid #d8d4ff;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900}
 .list{display:grid;gap:8px;margin-top:8px}
-.insight{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.07);border-left:3px solid #8bd65d;border-radius:10px;padding:12px 12px;font-size:12px;color:#eff9ec}
+.insight{display:flex;gap:10px;align-items:flex-start;background:#eef8f8;border-left:3px solid #12a4a7;border-radius:10px;padding:12px 12px;font-size:12px;color:#173b49}
 .insight.bad{border-left-color:#f87171}
 .insight.warn{border-left-color:#fbbf24}
 .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .controls input,.controls select{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;min-width:140px}
 .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:10px 10px;border-bottom:1px solid #e7ebf2;vertical-align:top;white-space:nowrap}
-th{background:#edf1f7;color:#36435a;text-align:left;cursor:pointer;position:sticky;top:0;z-index:1}
+th,td{padding:10px 10px;border-bottom:1px solid #e5e8f0;vertical-align:top;white-space:nowrap}
+th{background:#eef1ff;color:#313b5f;text-align:left;cursor:pointer;position:sticky;top:0;z-index:1}
 td.num{text-align:right;font-variant-numeric:tabular-nums}
-tbody tr:hover{background:#f5f7fb}
-.toolbar{background:linear-gradient(180deg,#fff,#fafbfe)}
-#overview>.grid3:first-child{grid-template-columns:1fr 1fr}
-#overview>.grid3:first-child .card:first-child{grid-column:1 / -1;min-height:360px}
-#overview>.grid3:first-child .card:first-child .chart-wrap{height:290px}
-#overview>.grid3:first-child .card:first-child{border-top:4px solid #4f83e3}
-#overview>.grid3:first-child .card:nth-child(2){border-top:4px solid #e86464}
-#overview>.grid3:first-child .card:nth-child(3){border-top:4px solid #8b6fd6}
-#overview>.grid3:nth-child(2) .card:first-child{border-top:4px solid #45a9a5}
-#overview>.grid3:nth-child(2) .card:nth-child(2){border-top:4px solid #f2a64b}
-#overview>.grid3:nth-child(2){grid-template-columns:1fr 1fr}
-#overview>.grid3:nth-child(2) .card.dark{grid-column:1 / -1;grid-row:1;order:-1;min-height:auto}
-#overview>.grid3:nth-child(2) .card.dark .list{grid-template-columns:repeat(3,1fr);gap:10px}
+tbody tr:hover{background:#f5f6ff}
 .small{font-size:11px;color:var(--muted)}
 .footer{text-align:center;color:var(--muted);font-size:11px;padding:20px 0 8px}
 .empty{padding:28px;text-align:center;color:var(--muted)}
-.lot-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:14px}
-.lot-heading h3{margin-bottom:5px}
-.lot-heading .desc{margin:0}
-.lot-controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.lot-controls input,.lot-controls select{border:1px solid var(--line);border-radius:11px;background:#fff;padding:10px 12px;color:var(--ink);min-width:145px}
-.lot-controls input{min-width:220px}
-.lot-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
-.lot-metric{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:#f8fafc}
-.lot-metric .metric-label{font-size:11px;font-weight:800;color:var(--muted)}
-.lot-metric .metric-value{margin-top:5px;font-size:21px;font-weight:950;color:#24324a}
-.lot-metric.risk{background:#fff3f3;border-color:#f4caca}.lot-metric.risk .metric-value{color:#d84d4d}
-.lot-metric.warn{background:#fff8eb;border-color:#f2d9aa}.lot-metric.warn .metric-value{color:#c67d20}
-.lot-result-count{margin:4px 0 10px;font-size:12px;color:var(--muted);font-weight:800}
-.status-badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900}
-.status-badge.risk{background:#fee2e2;color:#b91c1c}.status-badge.warn{background:#fef3c7;color:#a16207}.status-badge.ok{background:#dcfce7;color:#166534}
-.story-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:16px}
-.story-head h2{margin:0 0 6px;font-size:23px;letter-spacing:-.6px}
-.story-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
-.story-tag{flex:none;padding:7px 11px;border-radius:999px;background:#eaf5ee;color:#276b4d;font-size:11px;font-weight:900}
-.rule-list{display:grid;gap:10px}
-.rule-row{display:grid;grid-template-columns:110px 1fr 1fr 130px;gap:12px;align-items:center;padding:15px;border:1px solid var(--line);border-radius:15px;background:#fbfcfe}
-.rule-source{font-weight:950;color:#2f7d5b}
-.rule-cell b{display:block;font-size:12px;margin-bottom:4px}.rule-cell span{display:block;color:var(--muted);font-size:11px;line-height:1.5}
-.rule-result{text-align:right;font-weight:950;color:#315fae;font-size:15px}
-.audit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.audit-card{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}
-.audit-card strong{display:block;font-size:25px;color:#17233f}.audit-card span{display:block;margin-top:5px;color:var(--muted);font-size:11px;line-height:1.5}
-.issue-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.issue-callout{margin-top:12px;padding:13px 14px;border-radius:13px;background:#f2f7f4;border-left:4px solid #66b77a;font-size:12px;line-height:1.65;color:#34473b}
-.compare-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.compare-box{padding:17px;border-radius:15px;border:1px solid var(--line);background:#fff}
-.compare-box b{display:block;font-size:26px}.compare-box span{font-size:11px;color:var(--muted)}
-.compare-box.alert b{color:#e86464}.compare-box.info b{color:#4f83e3}.compare-box.warn b{color:#f2a64b}
-.compact-table th,.compact-table td{padding:9px 10px}
-.tab[data-view="review"],.tab[data-view="return"]{display:none}
-.project-brief{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-bottom:16px}
-.project-question{padding:21px;border-radius:18px;background:linear-gradient(145deg,#17233f,#2d4775);color:#fff}
-.project-question small{display:block;color:#a9c7ff;font-weight:900;margin-bottom:8px}.project-question h2{margin:0;font-size:23px;line-height:1.35}.project-question p{margin:10px 0 0;color:#dce7f7;font-size:12px;line-height:1.65}
-.project-flow{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.flow-mini{padding:13px;border:1px solid var(--line);border-radius:14px;background:#fff}.flow-mini b{display:block;color:#2f7d5b;font-size:12px}.flow-mini span{display:block;margin-top:5px;color:var(--muted);font-size:11px}
-.evidence-map{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden}
-.evidence-map>div{padding:14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;line-height:1.55}.evidence-map>div:nth-child(3n){border-right:0}.evidence-map .map-head{background:#edf1f7;font-weight:950;color:#36435a}
-.loop-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.loop-step{padding:16px 12px;text-align:center;border:1px solid var(--line);border-radius:15px;background:#fff}.loop-step b{display:block;font-size:20px;color:#315fae}.loop-step span{display:block;margin-top:6px;font-size:11px;color:var(--muted);line-height:1.45}
-.method-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.method-card{padding:17px;border-radius:15px;border:1px solid var(--line);background:#fff}.method-card b{display:block;font-size:16px;color:#2f7d5b}.method-card p{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.6}
-.limit-list{display:grid;gap:9px}.limit-row{display:flex;gap:11px;padding:12px 14px;background:#f8fafc;border:1px solid var(--line);border-radius:13px;font-size:12px;line-height:1.55}.limit-row b{color:#e86464}
-@media(max-width:900px){.rule-row{grid-template-columns:1fr}.rule-result{text-align:left}.audit-grid,.compare-strip{grid-template-columns:1fr 1fr}.issue-grid{grid-template-columns:1fr}}
-@media(max-width:900px){.project-brief{grid-template-columns:1fr}.method-grid{grid-template-columns:1fr 1fr}.loop-grid{grid-template-columns:1fr 1fr}.evidence-map{grid-template-columns:1fr}.evidence-map>div{border-right:0}.evidence-map .map-head{display:none}}
-@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(3,1fr)} .grid3,#overview>.grid3:first-child,#overview>.grid3:nth-child(2){grid-template-columns:1fr}}
-@media(max-width:760px){.wrap{padding:12px} .topbar{display:block;padding:22px 18px} .top-actions{justify-content:flex-start;margin-top:18px} .kpi-grid,.grid2{grid-template-columns:1fr} #overview>.grid3:nth-child(2) .card.dark .list{grid-template-columns:1fr} .tabs{overflow:auto;flex-wrap:nowrap} .tab{white-space:nowrap} .controls{flex-direction:column;align-items:stretch} .card{min-height:auto} .lot-heading{display:block}.lot-controls{justify-content:flex-start;margin-top:12px}.lot-controls input,.lot-controls select{width:100%;min-width:0}.lot-metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(3,1fr)} .grid3{grid-template-columns:1fr}}
+@media(max-width:760px){.wrap{padding:12px} .topbar{display:block} .kpi-grid,.grid2{grid-template-columns:1fr} .tabs{overflow:auto;flex-wrap:nowrap} .tab{white-space:nowrap} .controls{flex-direction:column;align-items:stretch} .card{min-height:auto}}
+
+.tws-hero{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;margin-bottom:16px}
+.tws-title{background:#ffffff;color:#102d3b;border:1px solid #d2dee7;border-left:6px solid #12a4a7;border-radius:22px;padding:24px;box-shadow:var(--shadow)}
+.tws-title .eyebrow{font-size:11px;font-weight:900;letter-spacing:1.2px;color:#0b7f83}
+.tws-title h2{font-size:30px;margin:8px 0 6px;letter-spacing:-.8px}
+.tws-title p{margin:0;color:#6c7f8d;font-size:13px;line-height:1.65}
+.priority-badge{background:#fff0ed;border:1px solid #ffd1c9;border-radius:22px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.priority-badge strong{font-size:38px;color:#ef8c7d;letter-spacing:-1.5px}
+.priority-badge span{font-size:12px;color:#6e7687;margin-top:5px}
+.tws-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.tws-metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:var(--shadow)}
+.tws-metric .m-label{font-size:11px;color:var(--muted);font-weight:800}
+.tws-metric .m-value{font-size:25px;font-weight:950;margin-top:6px;letter-spacing:-.7px}
+.tws-metric .m-note{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.4}
+.accent-coral{color:#e52525}.accent-blue{color:#4f7fde}.accent-aqua{color:#12a4a7}.accent-violet{color:#0b6d72}
+.action-table td:first-child{font-weight:900;color:#0b6d72}
+.action-table td:nth-child(4){font-weight:900}
+.target-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.target{background:#fff7e8;color:#102d3b;border:1px solid #eed9b8;border-radius:15px;padding:14px 16px}
+.target b{display:block;font-size:12px;color:#6c7f8d;margin-bottom:6px}.target strong{font-size:19px;color:#d97716}
+.priority-table .priority-top td{background:#fff5f2;color:#c9675d;font-weight:900}.priority-table .priority-top td:first-child{border-left:4px solid #ef8c7d}
+.priority-table td:nth-child(1),.priority-table td:nth-child(3),.priority-table td:nth-child(4),.priority-table td:nth-child(5){text-align:right;font-variant-numeric:tabular-nums}.priority-table td:nth-child(2){font-weight:950}.risk-note{font-size:11px;font-weight:850;color:#5c6477}
+.insight-summary{background:#eef8f8;color:#102d3b;border:1px solid #c9e2e2;border-left:6px solid #12a4a7;border-radius:20px;padding:22px 24px;margin-top:16px;box-shadow:var(--shadow)}
+.insight-summary .eyebrow{color:#0b7f83;font-size:11px;font-weight:950;letter-spacing:1px}.insight-summary h3{font-size:22px;margin:7px 0}.insight-summary p{margin:0;color:#607987;font-size:13px;line-height:1.65}
+.insight-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}.insight-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.insight-card b{display:block;font-size:11px;color:#0b7f83;margin-bottom:7px}.insight-card strong{display:block;font-size:16px;line-height:1.35;color:#102d3b}.insight-card p{margin:7px 0 0;font-size:11px;line-height:1.55;color:var(--muted)}.insight-card .evidence{display:inline-block;margin-top:10px;padding:5px 8px;border-radius:999px;background:#eef5f8;color:#506978;font-size:10px;font-weight:900}
+.improvement-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;background:#ffffff;color:#102d3b;border:1px solid #d2dee7;border-left:6px solid #12a4a7;border-radius:22px;padding:23px 25px;box-shadow:var(--shadow)}.improvement-head h2{margin:5px 0 7px;font-size:27px;letter-spacing:-.7px}.improvement-head p{margin:0;color:#6c7f8d;line-height:1.6;font-size:13px}
+.result-link{display:inline-flex;align-items:center;justify-content:center;min-width:170px;padding:12px 15px;border-radius:12px;background:#0b6d72;color:#fff;text-decoration:none;font-weight:950;font-size:12px}.evidence-table td:first-child{font-weight:900;color:#102d3b}.evidence-table td:nth-child(2){font-weight:900;color:#e52525}.evidence-table td:nth-child(3){color:#0b6d72;font-weight:850}
+.apply-tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#e8f5f5;color:#0b6d72;font-weight:900;font-size:10px;margin:2px 3px 2px 0}.logic-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.logic-item{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;box-shadow:var(--shadow)}.logic-item b{display:block;color:#0b7f83;font-size:11px;margin-bottom:5px}.logic-item strong{font-size:15px}.logic-item p{margin:6px 0 0;font-size:11px;color:var(--muted);line-height:1.5}
+.chart-error{height:100%;min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:12px;background:#f7f6ff;color:#6e7687;font-size:12px;padding:20px}
+.target:first-child strong{color:#ff9b8d}
+.priority-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 16px}
+.flow-step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;position:relative;box-shadow:var(--shadow)}
+.flow-step:not(:last-child):after{content:'→';position:absolute;right:-13px;top:50%;transform:translateY(-50%);z-index:2;color:#0b6d72;font-weight:950}
+.flow-step b{display:block;font-size:11px;color:#0b7f83;margin-bottom:5px}.flow-step span{font-size:13px;font-weight:850}
+@media(max-width:1000px){.tws-hero{grid-template-columns:1fr}.tws-metrics,.target-strip{grid-template-columns:repeat(2,1fr)}.insight-cards{grid-template-columns:repeat(2,1fr)}.improvement-head{flex-direction:column}.logic-strip{grid-template-columns:1fr}}
+@media(max-width:800px){.priority-flow{grid-template-columns:1fr 1fr}.flow-step:after{display:none}}
+@media(max-width:620px){.tws-metrics,.target-strip,.priority-flow,.insight-cards{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="topbar">
     <div>
-      <h1>GreenSound 품질 통합 대시보드</h1>
-      <p>실제 수치 기반 · 리뷰 중복 포함 · 별점 원값 유지 · 파일 추가 업로드 시 즉시 재계산</p>
+      <h1>GreenSound 품질 개선 우선순위 대시보드</h1>
+      <p>총 반품검사 1,196건과 판매·리뷰·CS·입고품질을 종합해 개선 우선순위를 도출</p>
       <div class="pills" style="margin-top:12px">
         <span class="pill">기본 데이터 반영 완료</span>
         <span class="pill">추가 파일 업로드 지원</span>
@@ -150,7 +120,6 @@ tbody tr:hover{background:#f5f7fb}
       </div>
     </div>
     <div class="top-actions">
-      <a class="btn" href="https://tourmaline-horse-79bb13.netlify.app/" target="_blank" rel="noopener">고객용 제품 페이지 ↗</a>
       <button class="btn" onclick="document.getElementById('uploader').click()">파일 업로드</button>
       <button class="btn" onclick="downloadCurrent()">현재 표 CSV 저장</button>
       <button class="btn" onclick="window.print()">PDF 저장</button>
@@ -178,32 +147,73 @@ tbody tr:hover{background:#f5f7fb}
   </div>
 
   <nav class="tabs">
-    <button class="tab active" data-view="overview">01 종합 현황</button>
-    <button class="tab" data-view="cleaning">02 데이터 정제</button>
-    <button class="tab" data-view="issues">03 반복 문제</button>
+    <button class="tab active" data-view="overview">종합 현황</button>
     <button class="tab" data-view="product">제품별</button>
     <button class="tab" data-view="review">리뷰</button>
     <button class="tab" data-view="return">반품</button>
     <button class="tab" data-view="incoming">입고 품질</button>
-    <button class="tab" data-view="improvement">04 개선 전환</button>
-    <button class="tab" data-view="quality">05 분석 기준</button>
+    <button class="tab" data-view="priority">개선 우선순위</button>
+    <button class="tab" data-view="improvement">개선 적용</button>
     <button class="tab" data-view="explorer">상세 검색</button>
   </nav>
 
-  <section id="overview" class="view active section">
-    <div class="project-brief">
-      <div class="project-question">
-        <small>01 · PROJECT OVERVIEW</small>
-        <h2>고객이 불량이라고 느낀 이유와 실제 검사에서 확인된 결함을 분리합니다.</h2>
-        <p>리뷰·문의·반품·입고검사 데이터를 모델코드 기준으로 연결해 품질팀과 고객안내팀이 같은 숫자로 판단하도록 구성했습니다.</p>
+
+  <section id="priority" class="view section">
+    <div class="priority-flow">
+      <div class="flow-step"><b>01 · DATA</b><span>8개 제품 동일 기준 비교</span></div>
+      <div class="flow-step"><b>02 · SCORE</b><span>반품·불만·재현 불가 종합</span></div>
+      <div class="flow-step"><b>03 · PRIORITY</b><span>TWS-300 개선 1순위 도출</span></div>
+      <div class="flow-step"><b>04 · ACTION</b><span>원인별 개선과제 연결</span></div>
+    </div>
+    <div class="tws-hero">
+      <div class="tws-title">
+        <div class="eyebrow">INTEGRATED PRIORITY DIAGNOSIS</div>
+        <h2>데이터를 종합하면 TWS-300이 개선 1순위입니다</h2>
+        <p>8개 제품의 판매·반품·검사·리뷰·CS를 동일 기준으로 비교했습니다. TWS-300은 반품률, 불만 리뷰 비중, 재현 불가율이 모두 기준보다 높았습니다.</p>
       </div>
-      <div class="project-flow">
-        <div class="flow-mini"><b>① VOC 정리</b><span>리뷰·문의 유형 표준화</span></div>
-        <div class="flow-mini"><b>② 품질 대조</b><span>반품 판정·입고불량 확인</span></div>
-        <div class="flow-mini"><b>③ 개선 분기</b><span>품질검사·사용안내 구분</span></div>
-        <div class="flow-mini"><b>④ 재측정</b><span>문의·반품·LOT 추적</span></div>
+      <div class="priority-badge">
+        <div class="small">종합 개선 우선순위</div>
+        <strong>1위</strong>
+        <span>TWS-300 · 세 핵심 위험지표 모두 기준 초과</span>
       </div>
     </div>
+
+    <div class="tws-metrics">
+      <div class="tws-metric"><div class="m-label">판매수량</div><div class="m-value">2,249개</div><div class="m-note">8개 제품 중 최대</div></div>
+      <div class="tws-metric"><div class="m-label">반품검사</div><div class="m-value accent-coral">319건</div><div class="m-note">반품률 14.18%</div></div>
+      <div class="tws-metric"><div class="m-label">재현 불가</div><div class="m-value accent-violet">182건</div><div class="m-note">반품의 57.1%</div></div>
+      <div class="tws-metric"><div class="m-label">실제 불량 확인</div><div class="m-value accent-aqua">54건</div><div class="m-note">반품의 16.9%</div></div>
+      <div class="tws-metric"><div class="m-label">리뷰</div><div class="m-value accent-blue">4.08점</div><div class="m-note">불만 리뷰 32.4%</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>제품별 종합 개선 우선순위</h3>
+        <p class="desc">별도 가공점수 없이 실측 반품률이 높은 제품부터 비교</p>
+        <div class="table-wrap"><table id="priorityRankTable" class="priority-table" aria-label="제품별 종합 개선 우선순위"></table></div>
+      </div>
+      <div class="card">
+        <h3>1위로 선정된 세 가지 근거</h3>
+        <p class="desc">TWS-300과 전체·타 제품 기준 비교</p>
+        <div class="chart-wrap"><canvas id="chartTwsCompare"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid2 section">
+      <div class="card">
+        <h3>고객 언어로 확인한 핵심 원인</h3>
+        <p class="desc">CS 문의와 불만 리뷰 모두 연결·페어링이 1위</p>
+        <div class="chart-wrap"><canvas id="chartTwsVoc"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>319건을 검사했을 때 실제 불량은 일부였습니다</h3>
+        <p class="desc">재현 불가 182건이 실제 불량 54건보다 3.4배 많아, 상세페이지 안내 개선을 우선 실행</p>
+        <div class="chart-wrap"><canvas id="chartTwsVerdict"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="overview" class="view active section">
     <div class="grid3">
       <div class="card">
         <h3>월별 반품률 추이</h3>
@@ -221,7 +231,7 @@ tbody tr:hover{background:#f5f7fb}
         <div class="chart-wrap"><canvas id="chartReasonVerdict"></canvas></div>
       </div>
     </div>
-    <div class="grid3 section">
+    <div class="grid2 section">
       <div class="card">
         <h3>CS 문의 유형 분포</h3>
         <p class="desc">현재 반영 데이터 기준</p>
@@ -233,77 +243,7 @@ tbody tr:hover{background:#f5f7fb}
         <div class="chart-wrap"><canvas id="chartOperate"></canvas></div>
       </div>
     </div>
-  </section>
-
-  <section id="cleaning" class="view section">
-    <div class="card short">
-      <div class="story-head">
-        <div>
-          <h2>데이터 정제 기준과 선택 이유</h2>
-          <p>원본을 삭제하지 않고 분석 목적별 기준을 분리했습니다. 현재 대시보드에 반영된 데이터가 바뀌면 아래 수치도 함께 갱신됩니다.</p>
-        </div>
-        <span class="story-tag">02 · DATA CLEANING</span>
-      </div>
-      <div id="cleaningRules" class="rule-list"></div>
-    </div>
-    <div class="card short section">
-      <div class="story-head">
-        <div><h2>데이터 정합성 점검 결과</h2><p>결측, 중복, 분모, LOT 연결 여부를 숫자로 확인해 분석 범위를 투명하게 표시합니다.</p></div>
-      </div>
-      <div id="cleaningAudit" class="audit-grid"></div>
-    </div>
-  </section>
-
-  <section id="issues" class="view section">
-    <div class="card short">
-      <div class="story-head">
-        <div>
-          <h2>VOC에서 반복된 문제</h2>
-          <p>고객문의와 저평점 리뷰를 서로 다른 분모로 구분해 비교합니다.</p>
-        </div>
-        <span class="story-tag">03 · REPEATED ISSUES</span>
-      </div>
-      <div class="issue-grid">
-        <div>
-          <h3>고객문의 유형</h3>
-          <div class="chart-wrap"><canvas id="chartIssueCs"></canvas></div>
-          <div id="issueCsNote" class="issue-callout"></div>
-        </div>
-        <div>
-          <h3>저평점 리뷰 불만 유형</h3>
-          <div class="chart-wrap"><canvas id="chartIssueReview"></canvas></div>
-          <div id="issueReviewNote" class="issue-callout"></div>
-        </div>
-      </div>
-    </div>
-    <div class="card short section">
-      <div class="story-head">
-        <div><h2>고객 신고와 검사 결과의 차이</h2><p>고객이 불량이라고 느낀 사유와 품질팀의 실제 검사판정을 분리해 봅니다.</p></div>
-      </div>
-      <div id="issueCompare" class="compare-strip"></div>
-      <div class="issue-grid section">
-        <div><h3>전체 반품 검사판정</h3><div class="chart-wrap"><canvas id="chartIssueVerdict"></canvas></div></div>
-        <div><h3>작동·연결 불량 신고의 판정</h3><div class="chart-wrap"><canvas id="chartIssueOperate"></canvas></div></div>
-      </div>
-    </div>
-    <div class="card short section">
-      <div class="story-head">
-        <div><h2>입고검사 반복 불량과 제품별 관측 지표</h2><p>반복 불량 유형과 제품별 반품률·재현 불가율을 함께 확인합니다.</p></div>
-      </div>
-      <div class="issue-grid">
-        <div><div class="chart-wrap"><canvas id="chartIssueDefects"></canvas></div></div>
-        <div class="table-wrap"><table id="issueProductTable" class="compact-table"></table></div>
-      </div>
-    </div>
-    <div class="card short section">
-      <div class="story-head">
-        <div><h2>상세 교차표</h2><p>별도 탭에 중복되던 리뷰 요약과 고객신고 사유×검사판정 표를 한곳으로 통합했습니다.</p></div>
-      </div>
-      <div class="issue-grid">
-        <div><h3>제품별 리뷰 요약</h3><div class="table-wrap"><table id="issueReviewTable" class="compact-table"></table></div></div>
-        <div><h3>고객신고 사유 × 검사판정</h3><div class="table-wrap"><table id="issueMatrixTable" class="compact-table"></table></div></div>
-      </div>
-    </div>
+    <div id="insightList"></div>
   </section>
 
   <section id="product" class="view section">
@@ -373,64 +313,35 @@ tbody tr:hover{background:#f5f7fb}
       </div>
     </div>
     <div class="card short section">
-      <div class="lot-heading">
-        <div>
-          <h3>LOT 품질 상세</h3>
-          <p class="desc">불량률이 높은 LOT를 먼저 확인하고 모델·위탁처·상태별로 검색할 수 있습니다.</p>
-        </div>
-        <div class="lot-controls">
-          <input id="lotSearch" placeholder="LOT·모델·검사ID 검색">
-          <select id="lotVendorFilter"><option value="">전체 위탁처</option></select>
-          <select id="lotRiskFilter">
-            <option value="">전체 상태</option>
-            <option value="위험">위험</option>
-            <option value="주의">주의</option>
-            <option value="정상">정상</option>
-          </select>
-        </div>
-      </div>
-      <div id="lotMetrics" class="lot-metrics"></div>
-      <div id="lotResultCount" class="lot-result-count"></div>
+      <h3>LOT 상세</h3>
       <div class="table-wrap"><table id="lotTable"></table></div>
     </div>
   </section>
 
   <section id="improvement" class="view section">
+    <div class="improvement-head">
+      <div><div class="eyebrow">DATA-DRIVEN DETAIL PAGE</div><h2>분석 결과를 상세페이지의 안내·FAQ·문의 구조에 적용</h2><p>반품과 불만을 만든 사용 장벽을 구매 전후에 해소하도록 상세페이지 정보를 재구성했습니다.</p></div>
+      <a class="result-link" href="https://tourmaline-horse-79bb13.netlify.app/" target="_blank" rel="noopener">결과물 상세페이지 보기 ↗</a>
+    </div>
+    <div class="logic-strip">
+      <div class="logic-item"><b>01 · 문제 데이터</b><strong>반품 319건 · 재현 불가 57.1%</strong><p>연결·설정·착용 조건이 반품으로 전환</p></div>
+      <div class="logic-item"><b>02 · 개선 원칙</b><strong>구매 전 기대치 + 사용 중 자가진단</strong><p>기능 설명과 해결 방법을 한 화면에서 제공</p></div>
+      <div class="logic-item"><b>03 · 적용 결과</b><strong>Care Guide · Before Return · Q&amp;A</strong><p>증상 확인부터 문의 접수까지 연결</p></div>
+    </div>
     <div class="card short">
-      <div class="story-head">
-        <div><h2>데이터 근거를 고객 페이지 개선으로 전환</h2><p>반복 관측값을 품질 해석과 상세페이지·FAQ 요소로 연결합니다.</p></div>
-        <span class="story-tag">04 · EVIDENCE TO UI</span>
-      </div>
-      <div id="evidenceMap" class="evidence-map"></div>
+      <h3>개선과제 우선순위와 90일 목표</h3><p class="desc">효과가 크고 빠르게 실행 가능한 고객 접점 개선부터 적용</p>
+      <div class="table-wrap"><table class="action-table"><thead><tr><th>순위</th><th>개선과제</th><th>실행 내용</th><th>핵심 KPI</th></tr></thead><tbody>
+        <tr><td>1</td><td>연결 퀵가이드</td><td>멀티포인트 전환·재페어링 안내</td><td>연결 CS</td></tr><tr><td>2</td><td>반품 전 자가진단</td><td>연결·충전·착용·접점 4단계 점검</td><td>재현 불가율</td></tr><tr><td>3</td><td>증상별 FAQ·Q&amp;A</td><td>연결·착용·음질·외관별 답변 제공</td><td>문의 해결률</td></tr><tr><td>4</td><td>접수 정보 표준화</td><td>모델·색상·증상·기기·사진 수집</td><td>진단 리드타임</td></tr>
+      </tbody></table></div>
+      <div class="target-strip"><div class="target"><b>반품률</b><strong>14.18% → ≤11%</strong></div><div class="target"><b>재현 불가율</b><strong>57.1% → ≤40%</strong></div><div class="target"><b>불만 리뷰</b><strong>32.4% → ≤22%</strong></div><div class="target"><b>평균 별점</b><strong>4.08 → ≥4.30</strong></div></div>
     </div>
-    <div class="card short section">
-      <div class="story-head"><div><h2>고객지원과 품질 데이터의 순환 구조</h2><p>FAQ에서 해결되지 않은 문제를 구조화해 다음 품질분석 데이터로 축적합니다.</p></div></div>
-      <div class="loop-grid">
-        <div class="loop-step"><b>①</b><span>FAQ 검색</span></div>
-        <div class="loop-step"><b>②</b><span>자가진단 안내</span></div>
-        <div class="loop-step"><b>③</b><span>Q&A·AS 접수</span></div>
-        <div class="loop-step"><b>④</b><span>사용성·결함 분류</span></div>
-        <div class="loop-step"><b>⑤</b><span>대시보드 재분석</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="quality" class="view section">
-    <div class="card short">
-      <div class="story-head">
-        <div><h2>품질관리 관점의 분석 기준</h2><p>화면 제작보다 판단 기준, 데이터 정합성, 재발 방지 구조를 중심으로 정리했습니다.</p></div>
-        <span class="story-tag">05 · QUALITY METHOD</span>
-      </div>
-      <div class="method-grid">
-        <div class="method-card"><b>A · 기준 수립</b><p>원본과 분석용 데이터를 분리하고 분모·기간·결측 처리 기준을 명시했습니다.</p></div>
-        <div class="method-card"><b>B · 원인 대조</b><p>고객 신고를 실제 반품 판정 및 입고 불량유형과 교차 확인했습니다.</p></div>
-        <div class="method-card"><b>C · 개선 분기</b><p>사용안내로 줄일 문제와 부품·공정 점검이 필요한 문제를 분리했습니다.</p></div>
-        <div class="method-card"><b>D · 재측정</b><p>FAQ·Q&A·AS 접수 데이터를 다음 품질 분석에 재사용하도록 연결했습니다.</p></div>
-      </div>
-    </div>
-    <div class="card short section">
-      <div class="story-head"><div><h2>분석 한계와 계산 기준</h2><p>현재 데이터로 증명하지 못한 효과는 성과로 표현하지 않습니다.</p></div></div>
-      <div id="qualityLimits" class="limit-list"></div>
+    <div class="card short section"><h3>데이터 근거 → 상세페이지 적용 요소</h3><p class="desc">대시보드에서 확인된 문제를 결과물의 실제 화면 요소와 직접 연결</p>
+      <div class="table-wrap"><table class="evidence-table"><thead><tr><th>데이터 근거</th><th>핵심 수치</th><th>상세페이지 적용 요소</th><th>적용 의도</th></tr></thead><tbody>
+        <tr><td>재현 불가 판정이 실제 불량보다 큼</td><td>182건 · 57.1%<br>실제 불량 54건</td><td><span class="apply-tag">Before Return</span> 재페어링, 케이스 재장착, 이어팁 밀착, 충전 접점 점검</td><td>사용 조건 문제를 반품 전에 자가 해결</td></tr>
+        <tr><td>고객 문의와 리뷰 모두 연결 문제가 1위</td><td>CS 80건 · 26.7%<br>리뷰 VOC 31건 · 29.5%</td><td><span class="apply-tag">핵심 카피</span><span class="apply-tag">Care Guide</span> 멀티포인트 연결과 전환 방법</td><td>초기 연결 실패와 기대 차이를 감소</td></tr>
+        <tr><td>사용법·설정 문의가 두 번째</td><td>56건 · 18.7%</td><td><span class="apply-tag">사용 안내</span> 최초 충전, 기기 전환, ANC 착용 조건, 접점 청소</td><td>초기 사용 정보를 한 화면에서 제공</td></tr>
+        <tr><td>불만 리뷰와 평점 개선 필요</td><td>36건 · 32.4%<br>평균 4.08점</td><td><span class="apply-tag">리뷰</span><span class="apply-tag">Q&amp;A 6</span> 증상별 공개 답변</td><td>구매 전 불확실성과 반복 VOC 감소</td></tr>
+      </tbody></table></div>
     </div>
   </section>
 
@@ -472,9 +383,9 @@ let charts = {};
 let explorer = {dataset:'products', search:'', page:1, size:50, sortKey:null, sortDir:1};
 
 const COLORS = {
-  blue:'#4f83e3', red:'#e86464', orange:'#f2a64b', green:'#66b77a', teal:'#45a9a5',
-  slate:'#94a0b5', purple:'#8b6fd6', gray:'#d2d8e3', navy:'#17233f',
-  lime:'#a8c957', mint:'#77c8b1', forest:'#2f7d5b', sage:'#7f93b8'
+  blue:'#4f7fde', red:'#e52525', orange:'#e99b27', green:'#12a4a7', teal:'#2f9098',
+  slate:'#b8c5cf', purple:'#6d7fd0', gray:'#dce5ec', navy:'#102d3b',
+  lime:'#79a9e8', mint:'#6fc5c5', forest:'#2e6fb9', sage:'#89a6c8'
 };
 
 const fmt = n => Number(n||0).toLocaleString('ko-KR');
@@ -605,12 +516,10 @@ function buildSummary(){
   }, {})).map(r=>({...r, 불량률:r.검사수량 ? +(r.불량수량/r.검사수량*100).toFixed(2) : 0})).sort((a,b)=>b.불량률-a.불량률);
 
   const defectTypes = byCount(defects, '불량유형').map(r=>({불량유형:r.label, 건수:r.count, 비중:defects.length ? +(r.count/defects.length*100).toFixed(1) : 0}));
-  const lots = incoming.map(r=>{
-    const defectRate = toNum(r['검사수량']) ? +(toNum(r['불량수량'])/toNum(r['검사수량'])*100).toFixed(2) : toNum(r['불량률']);
-    const failed = String(r['합격여부']).includes('불합격');
-    const risk = failed || defectRate >= 3 ? '위험' : defectRate >= 2 ? '주의' : '정상';
-    return {...r, '불량률(%)':defectRate, '관리상태':risk};
-  }).sort((a,b)=>({위험:3,주의:2,정상:1}[b['관리상태']]-({위험:3,주의:2,정상:1}[a['관리상태']])) || toNum(b['불량률(%)'])-toNum(a['불량률(%)']));
+  const lots = incoming.map(r=>({
+    ...r,
+    '불량률(%)': toNum(r['검사수량']) ? +(toNum(r['불량수량'])/toNum(r['검사수량'])*100).toFixed(2) : toNum(r['불량률'])
+  })).sort((a,b)=>toNum(b['불량수량'])-toNum(a['불량수량']) || toNum(b['불량률(%)'])-toNum(a['불량률(%)'])).slice(0,120);
 
   let reviewStars = [], reviewVoc = [], reviewProducts = DEFAULT_RAW.fallback.reviews;
   let reviewCount = DEFAULT_RAW.fallback.meta.reviewCount, ratingTotal = DEFAULT_RAW.fallback.meta.ratingTotal, ratingAverage = DEFAULT_RAW.fallback.meta.ratingAverage;
@@ -715,6 +624,26 @@ function buildSummary(){
 }
 
 function setText(id, html){ document.getElementById(id).innerHTML = html; }
+
+function renderTws(s){
+  const tws = s.products.find(r=>r['모델코드']==='TWS-300') || {};
+  const complaintAvg = s.products.reduce((a,r)=>a+(Number(r['불만리뷰비중'])||0),0) / Math.max(1,s.products.length);
+  const other = s.products.filter(r=>r['모델코드']!=='TWS-300');
+  const otherNff = other.reduce((a,r)=>a+(Number(r['재현불가'])||0),0) / Math.max(1,other.reduce((a,r)=>a+(Number(r['기간정합반품'])||0),0)) * 100;
+  const ranked=[...s.products].filter(r=>Number.isFinite(Number(r['반품률']))).sort((a,b)=>Number(b['반품률'])-Number(a['반품률']));
+  const rankEl=document.getElementById('priorityRankTable');
+  if(rankEl){
+    const rows=ranked.map((r,i)=>`<tr class="${i===0?'priority-top':''}"><td>${i+1}위</td><td>${r['모델코드']}</td><td>${fmt(r['총반품검사'])}건</td><td>${Number(r['반품률']).toFixed(2)}%</td><td>${Number(r['불만리뷰비중']||0).toFixed(1)}%</td><td><span class="risk-note">${r['주요불만']||'-'}</span></td></tr>`).join('');
+    rankEl.innerHTML=`<thead><tr><th>순위</th><th>제품</th><th>반품검사</th><th>반품률</th><th>불만 리뷰</th><th>주요 불만</th></tr></thead><tbody>${rows}</tbody>`;
+  }
+  mkChart('chartTwsCompare',{type:'bar',data:{labels:['반품률','불만 리뷰 비중','이상 없음 판정률'],datasets:[
+    {label:'TWS-300',data:[Number(tws['반품률']||0),Number(tws['불만리뷰비중']||0),Number(tws['이상없음율']||0)],backgroundColor:COLORS.red,borderRadius:8},
+    {label:'전체·타 제품',data:[Number(s.meta.returnRate||0),complaintAvg,otherNff],backgroundColor:COLORS.blue,borderRadius:8}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,grid:{color:'#e6edf2'}}}}});
+  mkChart('chartTwsVoc',{type:'bar',data:{labels:['연결·페어링','사용법·설정','반품·교환 요청','A/S 문의'],datasets:[{label:'CS 건수',data:[80,56,51,48],backgroundColor:[COLORS.purple,COLORS.blue,COLORS.green,COLORS.slate],borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#e6edf2'}}}}});
+  mkChart('chartTwsVerdict',{type:'doughnut',data:{labels:['재현 불가','실제 불량 확인','기타 판정'],datasets:[{data:[182,54,83],backgroundColor:[COLORS.purple,COLORS.red,COLORS.gray],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom'}}}});
+}
+
 function renderKpis(s){
   setText('kSales', fmt(s.meta.salesTotal));
   setText('kSalesSub', '판매 집계 원본 ' + fmt(s.sales.length) + '행');
@@ -728,117 +657,49 @@ function renderKpis(s){
   setText('kIncomingRate', s.meta.incomingRate.toFixed(2) + '%');
   setText('kIncomingSub', fmt(s.meta.incomingDefects) + ' ÷ ' + fmt(s.meta.incomingTotal) + '개');
 }
-function renderCleaning(s){
-  const csTotal = s.csVoc.reduce((a,r)=>a+toNum(r.count),0);
-  const csLinked = RAW.csRaw.length
-    ? RAW.csRaw.filter(r=>String(r['모델코드']||'').trim()).length
-    : s.products.reduce((a,r)=>a+toNum(r['모델CS']),0);
-  const csMissing = Math.max(0, csTotal-csLinked);
-  const reviewSource = RAW.reviewsRaw.length || s.meta.reviewCount;
-  const incomingLots = new Set(s.incoming.map(r=>String(r['로트번호']||r['LOT번호']||'').trim()).filter(Boolean));
-  const defectWithLot = s.defects.filter(r=>incomingLots.has(String(r['로트번호']||r['LOT번호']||'').trim())).length;
-  const defectUnlinked = Math.max(0,s.defects.length-defectWithLot);
-  const topDefects = s.defectTypes.slice(0,3).reduce((a,r)=>a+toNum(r['건수']),0);
-
-  document.getElementById('cleaningRules').innerHTML = `
-    <div class="rule-row">
-      <div class="rule-source">리뷰</div>
-      <div class="rule-cell"><b>원본 별점 유지</b><span>1~5점 값을 임의 보정하지 않고 그대로 집계</span></div>
-      <div class="rule-cell"><b>중복 포함 기준 명시</b><span>중복 노출 가능성을 삭제하지 않고 분석 조건에 표시</span></div>
-      <div class="rule-result">${fmt(reviewSource)}건</div>
-    </div>
-    <div class="rule-row">
-      <div class="rule-source">고객문의</div>
-      <div class="rule-cell"><b>문의유형 표준화</b><span>연결, 사용법, 반품, AS, 배송 등 동일 기준으로 분류</span></div>
-      <div class="rule-cell"><b>모델코드 결측 분리</b><span>전체 문의 분석에는 포함하고 제품별 비교에서는 제외</span></div>
-      <div class="rule-result">${fmt(csLinked)}건 연결</div>
-    </div>
-    <div class="rule-row">
-      <div class="rule-source">반품·판매</div>
-      <div class="rule-cell"><b>총 반품검사 기준</b><span>기간 필터 없이 현재 반품검사 원본 전체를 사용</span></div>
-      <div class="rule-cell"><b>분모 기준 고정</b><span>제품별 반품건수 ÷ 제품별 판매수량</span></div>
-      <div class="rule-result">${fmt(s.meta.returnAll)}건 · ${s.meta.returnRate.toFixed(2)}%</div>
-    </div>
-    <div class="rule-row">
-      <div class="rule-source">입고·LOT</div>
-      <div class="rule-cell"><b>검사수량 기준</b><span>검사 건수가 아닌 실제 샘플 검사수량을 분모로 사용</span></div>
-      <div class="rule-cell"><b>LOT 연결 여부 분리</b><span>입고대장과 연결되지 않은 불량상세는 원인 분석에서 분리</span></div>
-      <div class="rule-result">${fmt(s.meta.incomingDefects)}개 불량</div>
-    </div>`;
-
-  document.getElementById('cleaningAudit').innerHTML = `
-    <div class="audit-card"><strong>${fmt(csMissing)}</strong><span>모델코드가 없어 제품별 문의율에서 분리된 문의</span></div>
-    <div class="audit-card"><strong>${fmt(defectUnlinked)}</strong><span>입고대장 LOT와 직접 연결되지 않은 불량상세</span></div>
-    <div class="audit-card"><strong>${fmt(s.meta.incomingTotal)}</strong><span>입고 샘플 검사수량 · 불량률 ${s.meta.incomingRate.toFixed(2)}%</span></div>
-    <div class="audit-card"><strong>${s.meta.incomingDefects ? (topDefects/s.meta.incomingDefects*100).toFixed(1) : '0.0'}%</strong><span>입고 불량 상위 3개 유형의 집중도</span></div>`;
-}
-function renderIssues(s){
-  const csTotal = s.csVoc.reduce((a,r)=>a+toNum(r.count),0);
-  const reviewVocTotal = s.reviewVoc.reduce((a,r)=>a+toNum(r.count),0);
-  const connectionCs = s.csVoc.filter(r=>/연결|페어링|사용법|설정/.test(r.label)).reduce((a,r)=>a+toNum(r.count),0);
-  const topReview = s.reviewVoc[0] || {label:'데이터 없음',count:0};
-  const noIssue = s.returnVerdicts.find(r=>String(r['항목']).includes('이상 없음'))?.['건수'] || 0;
-  const confirmed = s.returnVerdicts.find(r=>String(r['항목']).includes('불량 확인'))?.['건수'] || 0;
-  const operateTotal = s.operateVerdict.reduce((a,r)=>a+toNum(r.count),0);
-
-  mkChart('chartIssueCs',{type:'doughnut',data:{labels:s.csVoc.map(r=>r.label),datasets:[{data:s.csVoc.map(r=>r.count),backgroundColor:[COLORS.blue,COLORS.orange,COLORS.purple,COLORS.teal,COLORS.red,COLORS.gray]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
-  mkChart('chartIssueReview',{type:'bar',data:{labels:s.reviewVoc.map(r=>r.label),datasets:[{label:'건수',data:s.reviewVoc.map(r=>r.count),backgroundColor:COLORS.orange}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  mkChart('chartIssueVerdict',{type:'doughnut',data:{labels:s.returnVerdicts.map(r=>r['항목']),datasets:[{data:s.returnVerdicts.map(r=>r['건수']),backgroundColor:[COLORS.blue,COLORS.red,COLORS.gray,COLORS.orange,COLORS.teal]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
-  mkChart('chartIssueOperate',{type:'bar',data:{labels:s.operateVerdict.map(r=>r.label),datasets:[{label:'건수',data:s.operateVerdict.map(r=>r.count),backgroundColor:[COLORS.red,COLORS.blue,COLORS.orange,COLORS.teal]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  mkChart('chartIssueDefects',{type:'bar',data:{labels:s.defectTypes.slice(0,8).map(r=>r['불량유형']),datasets:[{label:'입고 불량 건수',data:s.defectTypes.slice(0,8).map(r=>r['건수']),backgroundColor:COLORS.purple}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-
-  document.getElementById('issueCsNote').textContent = `연결·페어링 및 사용법·설정 관련 문의는 ${fmt(connectionCs)}건으로 전체 ${fmt(csTotal)}건의 ${csTotal?(connectionCs/csTotal*100).toFixed(1):'0.0'}%입니다.`;
-  document.getElementById('issueReviewNote').textContent = `저평점 리뷰 불만 ${fmt(reviewVocTotal)}건 중 가장 많은 유형은 ‘${topReview.label}’ ${fmt(topReview.count)}건입니다.`;
-  document.getElementById('issueCompare').innerHTML = `
-    <div class="compare-box alert"><b>${fmt(confirmed)}</b><span>검사에서 실제 불량 확인</span></div>
-    <div class="compare-box info"><b>${fmt(noIssue)}</b><span>이상 없음·재현 불가 판정</span></div>
-    <div class="compare-box warn"><b>${fmt(operateTotal)}</b><span>작동·연결 불량 고객 신고</span></div>`;
-
-  const rows = s.products.slice().sort((a,b)=>b['반품률']-a['반품률']);
-  document.getElementById('issueProductTable').innerHTML = `<thead><tr><th>제품</th><th>반품</th><th>반품률</th><th>재현 불가</th><th>입고불량률</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r['모델코드'])}</b></td><td class="num">${fmt(r['총반품검사'])}</td><td class="num">${toNum(r['반품률']).toFixed(2)}%</td><td class="num">${toNum(r['이상없음율']).toFixed(1)}%</td><td class="num">${toNum(r['입고불량률']).toFixed(2)}%</td></tr>`).join('')}</tbody>`;
-  document.getElementById('issueReviewTable').innerHTML = `<thead><tr><th>제품</th><th>리뷰</th><th>평점</th><th>불만비중</th></tr></thead><tbody>${s.reviewProducts.map(r=>`<tr><td><b>${esc(r['모델코드'])}</b></td><td class="num">${fmt(r['리뷰수'])}</td><td class="num">${toNum(r['평균별점']).toFixed(2)}</td><td class="num">${toNum(r['불만리뷰비중']).toFixed(1)}%</td></tr>`).join('')}</tbody>`;
-  const verdictKeys = unique(s.matrix.flatMap(row=>Object.keys(row).filter(k=>k!=='고객신고사유')));
-  document.getElementById('issueMatrixTable').innerHTML = `<thead><tr><th>신고 사유</th>${verdictKeys.map(k=>`<th>${esc(k)}</th>`).join('')}</tr></thead><tbody>${s.matrix.map(r=>`<tr><td><b>${esc(r['고객신고사유'])}</b></td>${verdictKeys.map(k=>`<td class="num">${fmt(r[k]||0)}</td>`).join('')}</tr>`).join('')}</tbody>`;
-}
-function renderImprovement(s){
-  const csTotal = s.csVoc.reduce((a,r)=>a+toNum(r.count),0);
-  const guideCs = s.csVoc.filter(r=>/연결|페어링|사용법|설정/.test(r.label)).reduce((a,r)=>a+toNum(r.count),0);
-  const noIssue = s.returnVerdicts.find(r=>String(r['항목']).includes('이상 없음'))?.['건수'] || 0;
-  const noIssueRate = s.meta.returnAll ? noIssue/s.meta.returnAll*100 : 0;
-  const topDefect = s.defectTypes[0] || {불량유형:'데이터 없음',건수:0};
-  const riskProduct = s.products[0] || {};
-  document.getElementById('evidenceMap').innerHTML = `
-    <div class="map-head">관측 데이터</div><div class="map-head">품질 해석</div><div class="map-head">페이지·운영 반영</div>
-    <div><b>연결·사용법 문의 ${fmt(guideCs)}건</b><br>전체 문의의 ${csTotal?(guideCs/csTotal*100).toFixed(1):'0.0'}%</div><div>제품 고장 외에도 초기 설정과 기능 이해 문제가 반복됨</div><div>제품별 연결 가이드·FAQ·검색 키워드 강화</div>
-    <div><b>재현 불가 ${fmt(noIssue)}건</b><br>총 반품검사의 ${noIssueRate.toFixed(1)}%</div><div>고객 체감 문제와 검사실 재현 결과 사이에 차이가 있음</div><div>반품 전 1분 자가진단과 증상별 확인 절차 제공</div>
-    <div><b>${esc(topDefect['불량유형'])} ${fmt(topDefect['건수'])}건</b></div><div>안내만으로 해결할 수 없는 입고 품질 신호</div><div>입고 샘플링·부품·협력사 LOT 점검으로 연결</div>
-    <div><b>${esc(riskProduct['모델코드']||'-')} 반품률 ${toNum(riskProduct['반품률']).toFixed(2)}%</b></div><div>제품별 위험도가 달라 동일한 안내로 대응하기 어려움</div><div>고위험 제품 전용 구매 전 확인·FAQ 우선 노출</div>`;
-}
-function renderQuality(s){
-  const csTotal = s.csVoc.reduce((a,r)=>a+toNum(r.count),0);
-  const csLinked = RAW.csRaw.length ? RAW.csRaw.filter(r=>String(r['모델코드']||'').trim()).length : s.products.reduce((a,r)=>a+toNum(r['모델CS']),0);
-  const incomingLots = new Set(s.incoming.map(r=>String(r['로트번호']||r['LOT번호']||'').trim()).filter(Boolean));
-  const defectUnlinked = s.defects.filter(r=>!incomingLots.has(String(r['로트번호']||r['LOT번호']||'').trim())).length;
-  document.getElementById('qualityLimits').innerHTML = `
-    <div class="limit-row"><b>01</b><span>반품률은 <strong>총 반품검사 ${fmt(s.meta.returnAll)}건 ÷ 판매 ${fmt(s.meta.salesTotal)}개</strong>로 계산하며 기간정합 필터를 추가하지 않습니다.</span></div>
-    <div class="limit-row"><b>02</b><span>리뷰는 ${RAW.reviewsRaw.length?'업로드된 원본':'기존 집계값'} ${fmt(s.meta.reviewCount)}건을 사용하며 중복 가능성과 원본 별점을 유지합니다.</span></div>
-    <div class="limit-row"><b>03</b><span>전체 고객문의 ${fmt(csTotal)}건 중 모델코드가 연결된 ${fmt(csLinked)}건만 제품별 CS 비교에 사용합니다.</span></div>
-    <div class="limit-row"><b>04</b><span>입고대장의 LOT와 직접 연결되지 않은 불량상세 ${fmt(defectUnlinked)}건은 특정 협력사·공정 원인으로 단정하지 않습니다.</span></div>
-    <div class="limit-row"><b>05</b><span>상세페이지 개선 후 반품 감소·문의 감소 효과는 추후 동일 기간과 제품 기준으로 재측정해야 하며 현재 성과값으로 표시하지 않습니다.</span></div>`;
-}
 function destroyCharts(){ Object.values(charts).forEach(c=>c?.destroy && c.destroy()); charts={}; }
-function mkChart(id, config){ const ctx=document.getElementById(id); if(ctx) charts[id] = new Chart(ctx, config); }
+function mkChart(id, config){
+  const ctx=document.getElementById(id); if(!ctx) return;
+  try{ if(typeof Chart==='undefined') throw new Error('Chart.js load failed'); charts[id]?.destroy?.(); charts[id]=new Chart(ctx,config); }
+  catch(error){ console.error('[차트 오류]',id,error); const wrap=ctx.parentElement; if(wrap) wrap.innerHTML='<div class="chart-error">차트를 표시하지 못했습니다.<br>페이지를 새로고침해 주세요.</div>'; }
+}
+function resizeVisibleCharts(){ requestAnimationFrame(()=>Object.values(charts).forEach(chart=>{ const wrap=chart?.canvas?.parentElement; if(wrap&&wrap.clientWidth&&wrap.clientHeight) chart.resize(wrap.clientWidth,wrap.clientHeight); })); }
+function redrawActiveCharts(view){
+  destroyCharts();
+  if(view==='priority') renderTws(SUMMARY); if(view==='overview') renderOverview(SUMMARY); if(view==='product') renderProduct(SUMMARY);
+  if(view==='review') renderReview(SUMMARY); if(view==='return') renderReturn(SUMMARY); if(view==='incoming') renderIncoming(SUMMARY);
+  resizeVisibleCharts();
+}
 
 function renderOverview(s){
   mkChart('chartMonthly', {type:'line', data:{labels:s.monthly.map(r=>r['연월']), datasets:[
-    {label:'반품률(%)', data:s.monthly.map(r=>r['반품률']), borderColor:COLORS.red, backgroundColor:'rgba(232,100,100,.10)', tension:.3, yAxisID:'y'},
-    {label:'판매수량', data:s.monthly.map(r=>r['판매수량']), borderColor:COLORS.blue, backgroundColor:'rgba(79,131,227,.12)', tension:.3, yAxisID:'y1'}
+    {label:'반품률(%)', data:s.monthly.map(r=>r['반품률']), borderColor:COLORS.red, backgroundColor:'rgba(229,37,37,.10)', tension:.3, yAxisID:'y'},
+    {label:'판매수량', data:s.monthly.map(r=>r['판매수량']), borderColor:COLORS.blue, backgroundColor:'rgba(79,127,222,.12)', tension:.3, yAxisID:'y1'}
   ]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top'}}, scales:{y:{title:{display:true,text:'반품률(%)'}}, y1:{position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'판매수량'}}}}});
-  mkChart('chartProductReturn', {type:'bar', data:{labels:s.products.map(r=>r['모델코드']), datasets:[{label:'반품률(%)', data:s.products.map(r=>r['반품률']), backgroundColor:[COLORS.red,COLORS.orange,COLORS.purple,COLORS.blue,COLORS.teal,COLORS.green,COLORS.sage,COLORS.lime]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}});
+  mkChart('chartProductReturn', {type:'bar', data:{labels:s.products.map(r=>r['모델코드']), datasets:[{label:'반품률(%)', data:s.products.map(r=>r['반품률']), backgroundColor:COLORS.green}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}});
   const verdictKeys = unique(s.matrix.flatMap(r=>Object.keys(r).filter(k=>k!=='고객신고사유')));
-  mkChart('chartReasonVerdict', {type:'bar', data:{labels:s.matrix.map(r=>r['고객신고사유']), datasets:verdictKeys.map((k,i)=>({label:k, data:s.matrix.map(r=>r[k]||0), backgroundColor:[COLORS.blue,COLORS.red,COLORS.orange,COLORS.purple,COLORS.teal][i%5]}))}, options:{indexAxis:'y',responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top'}}, scales:{x:{stacked:true,beginAtZero:true}, y:{stacked:true}}}});
-  mkChart('chartCs', {type:'doughnut', data:{labels:s.csVoc.map(r=>r.label), datasets:[{data:s.csVoc.map(r=>r.count), backgroundColor:[COLORS.blue,COLORS.orange,COLORS.purple,COLORS.teal,COLORS.red,COLORS.gray]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
-  mkChart('chartOperate', {type:'doughnut', data:{labels:s.operateVerdict.map(r=>r.label), datasets:[{data:s.operateVerdict.map(r=>r.count), backgroundColor:[COLORS.red,COLORS.blue,COLORS.orange,COLORS.teal,COLORS.gray]}]}, options:{responsive:true, maintainAspectRatio:false, cutout:'58%', plugins:{legend:{position:'bottom'}}}});
+  mkChart('chartReasonVerdict', {type:'bar', data:{labels:s.matrix.map(r=>r['고객신고사유']), datasets:verdictKeys.map((k,i)=>({label:k, data:s.matrix.map(r=>r[k]||0), backgroundColor:[COLORS.forest,COLORS.green,COLORS.lime,COLORS.sage,COLORS.mint][i%5]}))}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top'}}, scales:{x:{stacked:true}, y:{stacked:true, beginAtZero:true}}}});
+  mkChart('chartCs', {type:'doughnut', data:{labels:s.csVoc.map(r=>r.label), datasets:[{data:s.csVoc.map(r=>r.count), backgroundColor:[COLORS.forest,COLORS.green,COLORS.lime,COLORS.mint,COLORS.sage,COLORS.gray]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
+  mkChart('chartOperate', {type:'pie', data:{labels:s.operateVerdict.map(r=>r.label), datasets:[{data:s.operateVerdict.map(r=>r.count), backgroundColor:[COLORS.forest,COLORS.green,COLORS.lime,COLORS.mint,COLORS.gray]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
+
+  const topReturn = s.products[0];
+  const topDefect = s.defectTypes[0];
+  const topReason = s.returnReasons[0];
+  const operateNoIssue = s.operateVerdict.find(r=>r.label==='이상 없음(재현 불가)')?.count || 0;
+  const totalOperate = s.operateVerdict.reduce((a,r)=>a+r.count,0) || 1;
+  const reviewTop = [...s.reviewProducts].sort((a,b)=>(b['리뷰수']||0)-(a['리뷰수']||0))[0];
+  document.getElementById('insightList').innerHTML = `
+    <div class="insight-summary">
+      <div class="eyebrow">WHY RETURNS INCREASED</div>
+      <h3>TWS-300의 높은 반품률은 ‘연결·설정 사용 장벽’과 ‘초기 품질 문제’가 함께 나타난 결과로 보입니다</h3>
+      <p>판매량이 많으면 반품 건수는 커질 수 있지만, 판매량 자체가 반품률 상승의 원인은 아닙니다. 핵심은 TWS-300의 반품률이 전체보다 4.45%p 높고, 연결·설정 문의와 이상 없음 판정이 반복됐다는 점입니다. 데이터상 초기 연결, 기기 전환, 착용·충전 조건과 일부 실제 품질 문제가 함께 반품으로 이어진 것으로 해석됩니다.</p>
+    </div>
+    <div class="insight-cards">
+      <div class="insight-card"><b>01 · 우선 분석 대상</b><strong>TWS-300에서 가장 높은 반품률 확인</strong><p>판매량이 아니라 반품률을 기준으로 보면 TWS-300은 전체 평균보다 4.45%p 높아 가장 먼저 개선해야 할 제품입니다.</p><span class="evidence">14.18% · 전체 9.73%</span></div>
+      <div class="insight-card"><b>02 · 사용 경험</b><strong>연결·설정 문제가 반품 전조로 반복</strong><p>페어링·연결과 사용법·설정 문의가 CS 상위권이며 리뷰에서도 연결 문제가 가장 많이 나타났습니다.</p><span class="evidence">연결 CS 80건 · 설정 56건</span></div>
+      <div class="insight-card"><b>03 · 검사 판정</b><strong>실제 고장보다 재현되지 않은 문제가 많음</strong><p>TWS-300 반품 319건 중 이상 없음 판정이 182건으로 실제 불량 54건보다 3.4배 많았습니다.</p><span class="evidence">이상 없음 57.1%</span></div>
+      <div class="insight-card"><b>04 · 입고 품질</b><strong>하드웨어 요인도 일부 함께 존재</strong><p>TWS-300 입고 불량률은 전체 샘플 불량률보다 높아 사용 안내와 함께 제조·검사 개선도 병행해야 합니다.</p><span class="evidence">TWS-300 3.23% · 전체 1.89%</span></div>
+    </div>`;
 }
 function renderTable(elId, rows, columns){
   const el=document.getElementById(elId); if(!el) return;
@@ -859,13 +720,13 @@ function renderProduct(s){
     {key:'주요불만',label:'주요불만'}
   ]);
   mkChart('chartReviewProduct', {type:'bar', data:{labels:s.products.map(r=>r['모델코드']), datasets:[
-    {label:'평균별점', data:s.products.map(r=>r['평균별점']), backgroundColor:'rgba(79,131,227,.88)', yAxisID:'y'},
-    {label:'불만리뷰비중(%)', data:s.products.map(r=>r['불만리뷰비중']), backgroundColor:'rgba(232,100,100,.82)', yAxisID:'y1'}
+    {label:'평균별점', data:s.products.map(r=>r['평균별점']), backgroundColor:'rgba(79,127,222,.82)', yAxisID:'y'},
+    {label:'불만리뷰비중(%)', data:s.products.map(r=>r['불만리뷰비중']), backgroundColor:'rgba(233,155,39,.82)', yAxisID:'y1'}
   ]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true,max:5}, y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false}}}}});
 }
 function renderReview(s){
-  mkChart('chartStars', {type:'bar', data:{labels:s.reviewStars.map(r=>r['별점']+'점'), datasets:[{label:'리뷰수', data:s.reviewStars.map(r=>r['리뷰수']), backgroundColor:[COLORS.red,COLORS.orange,COLORS.sage,COLORS.teal,COLORS.blue]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
-  mkChart('chartReviewVoc', {type:'doughnut', data:{labels:s.reviewVoc.map(r=>r.label), datasets:[{data:s.reviewVoc.map(r=>r.count), backgroundColor:[COLORS.blue,COLORS.red,COLORS.orange,COLORS.purple,COLORS.teal,COLORS.green,COLORS.sage,COLORS.gray]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
+  mkChart('chartStars', {type:'bar', data:{labels:s.reviewStars.map(r=>r['별점']+'점'), datasets:[{label:'리뷰수', data:s.reviewStars.map(r=>r['리뷰수']), backgroundColor:COLORS.green}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
+  mkChart('chartReviewVoc', {type:'doughnut', data:{labels:s.reviewVoc.map(r=>r.label), datasets:[{data:s.reviewVoc.map(r=>r.count), backgroundColor:[COLORS.forest,COLORS.green,COLORS.lime,COLORS.mint,COLORS.sage,COLORS.teal,COLORS.gray,COLORS.orange]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
   renderTable('reviewTable', s.reviewProducts, [
     {key:'모델코드',label:'모델코드'},
     {key:'리뷰수',label:'리뷰수',num:true,render:v=>fmt(v)},
@@ -879,49 +740,18 @@ function renderReview(s){
   ]);
 }
 function renderReturn(s){
-  mkChart('chartReturnReasons', {type:'bar', data:{labels:s.returnReasons.map(r=>r['항목']), datasets:[{label:'건수', data:s.returnReasons.map(r=>r['건수']), backgroundColor:COLORS.orange}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
-  mkChart('chartReturnVerdict', {type:'doughnut', data:{labels:s.returnVerdicts.map(r=>r['항목']), datasets:[{data:s.returnVerdicts.map(r=>r['건수']), backgroundColor:[COLORS.red,COLORS.blue,COLORS.gray,COLORS.orange,COLORS.teal]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
+  mkChart('chartReturnReasons', {type:'bar', data:{labels:s.returnReasons.map(r=>r['항목']), datasets:[{label:'건수', data:s.returnReasons.map(r=>r['건수']), backgroundColor:COLORS.lime}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
+  mkChart('chartReturnVerdict', {type:'doughnut', data:{labels:s.returnVerdicts.map(r=>r['항목']), datasets:[{data:s.returnVerdicts.map(r=>r['건수']), backgroundColor:[COLORS.forest,COLORS.green,COLORS.gray,COLORS.lime,COLORS.mint]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}});
   const verdictKeys = unique(s.matrix.flatMap(r=>Object.keys(r).filter(k=>k!=='고객신고사유')));
   renderTable('matrixTable', s.matrix, [{key:'고객신고사유',label:'고객신고사유'}, ...verdictKeys.map(k=>({key:k,label:k,num:true,render:v=>fmt(v||0)}))]);
 }
 function renderIncoming(s){
-  mkChart('chartDefects', {type:'bar', data:{labels:s.defectTypes.map(r=>r['불량유형']), datasets:[{label:'건수', data:s.defectTypes.map(r=>r['건수']), backgroundColor:COLORS.purple}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
-  mkChart('chartVendors', {type:'bar', data:{labels:s.vendors.map(r=>r['위탁처']), datasets:[{label:'불량률(%)', data:s.vendors.map(r=>r['불량률']), backgroundColor:[COLORS.blue,COLORS.orange,COLORS.teal,COLORS.purple]}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}});
-  const vendorFilter = document.getElementById('lotVendorFilter');
-  vendorFilter.innerHTML = '<option value="">전체 위탁처</option>' + unique(s.lots.map(r=>r['위탁처']).filter(Boolean)).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
-  const refreshLots = ()=>renderLotDetails(s.lots);
-  document.getElementById('lotSearch').oninput = refreshLots;
-  vendorFilter.onchange = refreshLots;
-  document.getElementById('lotRiskFilter').onchange = refreshLots;
-  refreshLots();
-}
-
-function renderLotDetails(lots){
-  const keyword = String(document.getElementById('lotSearch')?.value || '').trim().toLowerCase();
-  const vendor = document.getElementById('lotVendorFilter')?.value || '';
-  const risk = document.getElementById('lotRiskFilter')?.value || '';
-  const filtered = lots.filter(r=>{
-    const haystack = [r['로트번호'],r['모델코드'],r['검사ID'],r['위탁처'],r['입고일']].join(' ').toLowerCase();
-    return (!keyword || haystack.includes(keyword)) && (!vendor || r['위탁처']===vendor) && (!risk || r['관리상태']===risk);
-  });
-  const inspected = filtered.reduce((a,r)=>a+toNum(r['검사수량']),0);
-  const defects = filtered.reduce((a,r)=>a+toNum(r['불량수량']),0);
-  const failCount = filtered.filter(r=>String(r['합격여부']).includes('불합격')).length;
-  const highRisk = filtered.filter(r=>r['관리상태']==='위험').length;
-  const weightedRate = inspected ? defects/inspected*100 : 0;
-  document.getElementById('lotMetrics').innerHTML = `
-    <div class="lot-metric"><div class="metric-label">조회 LOT</div><div class="metric-value">${fmt(filtered.length)}건</div></div>
-    <div class="lot-metric risk"><div class="metric-label">위험 LOT</div><div class="metric-value">${fmt(highRisk)}건</div></div>
-    <div class="lot-metric warn"><div class="metric-label">불합격 LOT</div><div class="metric-value">${fmt(failCount)}건</div></div>
-    <div class="lot-metric"><div class="metric-label">가중 불량률</div><div class="metric-value">${weightedRate.toFixed(2)}%</div></div>`;
-  document.getElementById('lotResultCount').textContent = `총 ${fmt(lots.length)}개 중 ${fmt(filtered.length)}개 LOT 표시 · 위험도와 불량률이 높은 순`;
-  renderTable('lotTable', filtered, [
-    {key:'관리상태',label:'상태',render:v=>`<span class="status-badge ${v==='위험'?'risk':v==='주의'?'warn':'ok'}">${esc(v)}</span>`},
-    {key:'로트번호',label:'LOT'},{key:'모델코드',label:'모델'},{key:'위탁처',label:'위탁처'},{key:'입고일',label:'입고일'},
-    {key:'검사수량',label:'검사수량',num:true,render:v=>fmt(v)},{key:'불량수량',label:'불량수량',num:true,render:v=>fmt(v)},
-    {key:'불량률(%)',label:'불량률',num:true,render:v=>Number(v).toFixed(2)+'%'},
-    {key:'합격여부',label:'검사결과',render:v=>`<span class="status-badge ${String(v).includes('불합격')?'risk':'ok'}">${esc(v||'-')}</span>`},
-    {key:'검사ID',label:'검사ID'}
+  mkChart('chartDefects', {type:'bar', data:{labels:s.defectTypes.map(r=>r['불량유형']), datasets:[{label:'건수', data:s.defectTypes.map(r=>r['건수']), backgroundColor:COLORS.teal}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}});
+  mkChart('chartVendors', {type:'bar', data:{labels:s.vendors.map(r=>r['위탁처']), datasets:[{label:'불량률(%)', data:s.vendors.map(r=>r['불량률']), backgroundColor:COLORS.green}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}});
+  renderTable('lotTable', s.lots, [
+    {key:'검사ID',label:'검사ID'},{key:'입고일',label:'입고일'},{key:'모델코드',label:'모델코드'},{key:'로트번호',label:'LOT'},
+    {key:'위탁처',label:'위탁처'},{key:'검사수량',label:'검사수량',num:true,render:v=>fmt(v)},{key:'불량수량',label:'불량수량',num:true,render:v=>fmt(v)},
+    {key:'불량률(%)',label:'불량률',num:true,render:v=>Number(v).toFixed(2)+'%'},{key:'합격여부',label:'합격여부'}
   ]);
 }
 function explorerDatasets(){
@@ -993,11 +823,8 @@ function recomputeAndRender(){
   destroyCharts();
   SUMMARY = buildSummary();
   renderKpis(SUMMARY);
+  renderTws(SUMMARY);
   renderOverview(SUMMARY);
-  renderCleaning(SUMMARY);
-  renderIssues(SUMMARY);
-  renderImprovement(SUMMARY);
-  renderQuality(SUMMARY);
   renderProduct(SUMMARY);
   renderReview(SUMMARY);
   renderReturn(SUMMARY);
@@ -1016,8 +843,10 @@ document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click', ()=
   btn.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(btn.dataset.view).classList.add('active');
+  redrawActiveCharts(btn.dataset.view);
 }));
 recomputeAndRender();
+resizeVisibleCharts();
 </script>
 </body>
 </html>
